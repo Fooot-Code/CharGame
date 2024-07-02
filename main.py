@@ -3,6 +3,7 @@
 # Import and initialize the pygame library
 import pygame
 from classes import *
+from os import path
 
 pygame.init()
 
@@ -11,42 +12,63 @@ WIDTH, HEIGHT = 1000, 600
 # Set up the drawing window
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 
+clock = pygame.time.Clock()
+
+# Load Images
+balloonImg = pygame.transform.scale(pygame.image.load("C:\\Documents\\GitHub\\CharGame\\balloon.png"), (75, 75))
+planeImg = pygame.transform.scale(pygame.image.load("C:\\Documents\\GitHub\\CharGame\\Plane1.jpg"), (75, 75))
+bulletImg = pygame.transform.scale(pygame.image.load("C:\\Documents\\GitHub\\CharGame\\R.jpg"), (75, 75))
+
 bulletList = []
 balloonList = []
 
 maxBalloonCount = 3
 balloonMoveFactor = 2
-planeMoveFactor = 2
+planeMoveFactor = 0.25
 
-plane1 = Plane(0, planeMoveFactor, 0, 0, 0, 0)
+plane1 = Plane(planeImg, planeMoveFactor, 100, 100, planeImg.get_width(), planeImg.get_height())
 
 # Run until the user asks to quit
 running = True
 while running:
-    plane1.draw()
-    
-    if len(balloonList) < maxBalloonCount:
-        for balloon in range(maxBalloonCount - len(balloonList)):
-            newBalloon = Balloon(1, balloonMoveFactor, WIDTH, HEIGHT, 0, 0, 1, 3)
+    dt = clock.tick(60)
 
-    for balloon in balloonList:
-        balloon.draw(screen)
-        if balloon.shouldBeRemoved:
-            balloonList.pop(balloonList.index(balloon))
-
-    # Fill the background with white
-    screen.fill((255, 255, 255))
-
-    # Did the user click the window close button?
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN:
-            plane1.handle_controls(event.key)
-            for bullet in bulletList:
-                balloon.handle_controls()
-            
+        keys = pygame.key.get_pressed()
+
+        plane1.handle_controls(keys, WIDTH, HEIGHT)
+    
+    # Fill the background with white
+    screen.fill((255, 255, 255))
+
+    plane1.draw(screen, dt)
+    
+    
+
+    # if len(balloonList) > 0:
+    #     for balloon in balloonList:
+    #         balloon.draw(screen)
+    #         if balloon.shouldBeRemoved:
+    #             balloonList.pop(balloonList.index(balloon))
+
+    # if len(bulletList) > 0:
+    #     for bullet in bulletList:
+    #         bullet.draw()
+    #         if bullet.shouldBeRemoved:
+    #             bulletList.pop(bulletList.index(bullet))
+
+    # if len(balloonList) < maxBalloonCount:
+    #     for balloon in range(maxBalloonCount - len(balloonList)):
+    #         newBalloon = Balloon(balloonImg, balloonMoveFactor, WIDTH, HEIGHT, WIDTH, balloonImg.get_width(), balloonImg.get_height(), balloonList)
+
+    
+
+    
+
+    
     # Flip the display
     pygame.display.flip()
     
