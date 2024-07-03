@@ -23,7 +23,8 @@ bulletList = []
 balloonList = []
 
 maxBalloonCount = 3
-balloonMoveFactor = 2
+balloonMoveFactor = 0.25
+bulletMoveFactor = 1
 planeMoveFactor = 0.25
 
 plane1 = Plane(planeImg, planeMoveFactor, 100, 100, planeImg.get_width(), planeImg.get_height())
@@ -39,30 +40,35 @@ while running:
 
         keys = pygame.key.get_pressed()
 
-        plane1.handle_controls(keys, WIDTH, HEIGHT)
+        plane1.handle_controls(keys, WIDTH, HEIGHT, dt, balloonList)
+
+    
+    if plane1.bulletShouldSpawn and len(bulletList) < 1:
+        bulletList.append(Bullet(bulletImg, bulletMoveFactor, 0, 0, bulletImg.get_width(), bulletImg.get_height(), plane1))
     
     # Fill the background with white
     screen.fill((255, 255, 255))
 
-    plane1.draw(screen, dt)
+    plane1.draw(screen)
     
+    if len(balloonList) < maxBalloonCount:
+        for balloon in range(maxBalloonCount - len(balloonList)):
+            newBalloon = Balloon(balloonImg, balloonMoveFactor, WIDTH, HEIGHT, WIDTH, balloonImg.get_width(), balloonImg.get_height(), bulletList)
+            balloonList.append(newBalloon)
+
+    if len(balloonList) > 0:
+        for balloon in balloonList:
+            balloon.draw(screen, dt)
+            if balloon.shouldBeRemoved:
+                balloonList.pop(balloonList.index(balloon))
+
+    if len(bulletList) > 0:
+        for bullet in bulletList:
+            bullet.draw(screen, WIDTH, dt)
+            if bullet.shouldBeRemoved:
+                bulletList.pop(bulletList.index(bullet))
+
     
-
-    # if len(balloonList) > 0:
-    #     for balloon in balloonList:
-    #         balloon.draw(screen)
-    #         if balloon.shouldBeRemoved:
-    #             balloonList.pop(balloonList.index(balloon))
-
-    # if len(bulletList) > 0:
-    #     for bullet in bulletList:
-    #         bullet.draw()
-    #         if bullet.shouldBeRemoved:
-    #             bulletList.pop(bulletList.index(bullet))
-
-    # if len(balloonList) < maxBalloonCount:
-    #     for balloon in range(maxBalloonCount - len(balloonList)):
-    #         newBalloon = Balloon(balloonImg, balloonMoveFactor, WIDTH, HEIGHT, WIDTH, balloonImg.get_width(), balloonImg.get_height(), balloonList)
 
     
 
