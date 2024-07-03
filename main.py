@@ -39,12 +39,12 @@ while running:
 
         keys = pygame.key.get_pressed()
 
-        plane1.handle_controls(keys, WIDTH, HEIGHT)
+        plane1.handle_controls(keys, WIDTH, HEIGHT, dt)
     
     # Fill the background with white
     screen.fill((255, 255, 255))
 
-    plane1.draw(screen, dt)
+    plane1.draw(screen)
     
     
 

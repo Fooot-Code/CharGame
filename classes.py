@@ -22,47 +22,30 @@ class Plane:
         self.bulletShouldSpawn = False
         self.pyrect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def draw(self, screen: pygame.Surface, dt):
-        if self.moveNorth:
-            self.pyrect.y -= self.moveFactor * dt
-        elif self.moveEast:
-            self.pyrect.x += self.moveFactor * dt
-        elif self.moveSouth:
-            self.pyrect.y += self.moveFactor * dt
-        elif self.moveWest:
-            self.pyrect.x -= self.moveFactor * dt
+    def handle_controls(self, eventKey, screenWidth, screenHeight, dt):
+        key_to_direction = {
+            pygame.K_w: (0, -1),  # North
+            pygame.K_d: (1, 0),   # East
+            pygame.K_s: (0, 1),   # South
+            pygame.K_a: (-1, 0)   # West
+        }
 
-        screen.blit(self.image, self.pyrect)
+        direction = key_to_direction.get(eventKey, (0, 0))
+        dx, dy = direction
 
-    def handle_controls(self, eventKey, screenWidth, screenHeight):
-        canMoveNorth = self.y > 0
-        canMoveEast = self.x + self.width < screenWidth
-        canMoveSouth = self.y + self.height < screenHeight
-        canMoveWest = self.x >= 0
+        new_x = self.x + dx * self.moveFactor * dt
+        new_y = self.y + dy * self.moveFactor * dt
 
+        if 0 <= new_x < screenWidth:
+            self.pyrect.x = new_x
+        if 0 <= new_y < screenHeight:
+            self.pyrect.y = new_y
 
-        if eventKey[pygame.K_w] and canMoveNorth:
-            self.moveNorth = True
-            self.moveEast = False
-            self.moveSouth = False
-            self.moveWest = False
-        elif eventKey[pygame.K_d] and canMoveEast:
-            self.moveEast = True
-            self.moveNorth = False
-            self.moveSouth = False
-            self.moveWest = False
-        elif eventKey[pygame.K_s] and canMoveSouth:
-            self.moveSouth = True
-            self.moveWest = False
-            self.moveNorth = False
-            self.moveEast = False
-        elif eventKey[pygame.K_a] and canMoveWest:
-            self.moveWest = True
-            self.moveNorth = False
-            self.moveEast = False
-            self.moveSouth = False
-        elif eventKey[pygame.K_SPACE]:
+        if eventKey[pygame.K_SPACE]:
             self.bulletShouldSpawn = True
+
+    def draw(self, screen: pygame.Surface):
+        screen.blit(self.image, self.pyrect)
 
         
         
