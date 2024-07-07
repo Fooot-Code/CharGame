@@ -2,6 +2,8 @@ import pygame
 from typing import override
 from random import randint
 
+
+
 def update_rect(x, y, width, height):
     return pygame.Rect(x, y, width, height)
 
@@ -15,10 +17,9 @@ class Plane:
         self.width = width
         self.height = height
 
-        self.moveNorth = False
-        self.moveEast = False
-        self.moveSouth = False
-        self.moveWest = False
+        self.score = 0
+        self.health = 10
+        self.endGame = False
         self.movementX = 0
         self.movementY = 0
         self.bulletShouldSpawn = False
@@ -32,7 +33,7 @@ class Plane:
 
         screen.blit(self.image, self.pyrect)
 
-    def handle_controls(self, eventKey, screenWidth, screenHeight, dt, balloonList):
+    def handle_controls(self, eventKey, screenWidth, screenHeight, dt, bulletBooleanList):
 
         dt /= 10
         
@@ -78,13 +79,17 @@ class Plane:
             self.movementX -= deltaAdjMovementFactor
             self.movementY += deltaAdjMovementFactor
 
-        if eventKey[pygame.K_SPACE]:
-            self.bulletShouldSpawn = True
+        print(eventKey[pygame.K_SPACE])
 
-        if len(balloonList) > 0:
-            for balloon in balloonList:
-                if self.pyrect.colliderect(balloon.return_rect()):
-                    pass
+        if eventKey[pygame.K_SPACE]:
+            for bool in bulletBooleanList:
+                if not bool:
+                    bool = True
+                    break
+            self.bulletShouldSpawn = True
+        
+        if self.health <= 0:
+            self.endGame = True
 
     def return_rect(self) -> pygame.Rect:
         return self.pyrect
@@ -101,8 +106,8 @@ class Bullet:
         self.height = height
 
         self.plane = plane
-        self.x = self.plane.x + self.plane.width
-        self.y = self.plane.y
+        self.x = self.plane.x + self.plane.width - 40
+        self.y = self.plane.y + 60
         self.pyrect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.shouldBeRemoved = False
         self.spaceKeyPressed = False
@@ -118,7 +123,7 @@ class Bullet:
         
         if self.x >= screenWidth:
             self.shouldBeRemoved = True
-            self.plane.bulletShouldSpawn = False
+            #self.plane.bulletShouldSpawn = False
 
     def return_rect(self) -> pygame.Rect:
         return self.pyrect
@@ -126,7 +131,7 @@ class Bullet:
 
 
 class Balloon:
-    def __init__(self, image, moveFactor, screenWidth, screenHeight, x, width, height, bulletList: list):
+    def __init__(self, image, moveFactor, screenWidth, screenHeight, x, width, height, plane: Plane, bulletList: list):
         self.self = self
         self.image = image
         self.moveFactor = moveFactor
@@ -135,6 +140,7 @@ class Balloon:
         self.x = x
         self.width = width
         self.height = height
+        self.plane = plane
         self.bulletList = bulletList
 
         self.shouldBeRemoved = False
@@ -149,6 +155,7 @@ class Balloon:
         if self.bulletList != None:
             for bullet in self.bulletList:
                 if self.pyrect.colliderect(bullet.return_rect()):
+                    bullet.plane.score += 1
                     self.moveFactor = 0
                     self.image = popImg
                     self.shouldBeRemoved = True
